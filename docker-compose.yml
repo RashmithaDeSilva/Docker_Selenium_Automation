@@ -1,0 +1,41 @@
+services:
+  # Web browser container
+  chrome:
+    image: selenium/standalone-chrome:latest
+    # image: selenium/standalone-firefox:latest
+    # image: selenium/standalone-edge:latest
+    shm_size: 2gb # shared memory
+    ports:
+      - "4444:4444" # Expose Selenium port
+      - "7900:7900" # Expose VNC port (password: secret)
+    environment:
+      # Fix the screen size so the video recorder knows exactly what to capture
+      - SE_SCREEN_WIDTH=1920
+      - SE_SCREEN_HEIGHT=1080
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4444/wd/hub/status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Python script container
+  scraper:
+    build: .
+    depends_on:
+      chrome:
+        condition: service_healthy
+    environment:
+      - SELENIUM_HOST=chrome
+    volumes:
+      - ./main.py:/app/main.py # Mount script for easy editing
+
+  # Video Recording Service
+  # video:
+  #   image: selenium/video:latest
+  #   volumes:
+  #     - ./videos:/videos
+  #   depends_on:
+  #     - chrome
+  #   environment:
+  #     - DISPLAY_CONTAINER_NAME=chrome
+  #     - FILE_NAME=recording.mp4
