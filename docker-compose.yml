@@ -2,16 +2,17 @@ services:
   # Web browser container
   chrome:
     image: selenium/standalone-chrome:latest
+    # image: selenium/standalone-chromium:latest
     # image: selenium/standalone-firefox:latest
-    # image: selenium/standalone-edge:latest
+    # image: selenium/standalone-edge:latest  # This image only work on windows 
     shm_size: 2gb # shared memory
     ports:
       - "4444:4444" # Expose Selenium port
       - "7900:7900" # Expose VNC port (password: secret)
     environment:
       # Fix the screen size so the video recorder knows exactly what to capture
-      - SE_SCREEN_WIDTH=1920
-      - SE_SCREEN_HEIGHT=1080
+      - SE_SCREEN_WIDTH=${SE_SCREEN_WIDTH}
+      - SE_SCREEN_HEIGHT=${SE_SCREEN_HEIGHT}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:4444/wd/hub/status"]
       interval: 10s
