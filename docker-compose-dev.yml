@@ -1,0 +1,37 @@
+services:
+  code-server:
+    image: ghcr.io/coder/code-server
+    # image: lscr.io/linuxserver/code-server:latest
+    container_name: dev-vscode
+    restart: unless-stopped
+    environment:
+      # Loads the password from the .env file
+      - PASSWORD=${VSCODE_PASSWORD}
+      - TZ=UTC
+      # specific user/group IDs to match host (optional, prevents permission issues)
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      # Persist VS Code extensions and user data
+      - ./code-data:/home/coder/.local/share/code-server
+      - ./code-config:/home/coder/.config
+      # Mount your actual project directory
+      - ./projects:/home/coder/workspace
+      # STRICTLY REQUIRED for "doing any development":
+      # Allows you to use docker commands INSIDE the container
+      # - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - "8080:8080"
+    # Capable is required for some debugging tools like GDB
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - seccomp:unconfined
+
+    # Optional: If you want it on a custom network
+    networks:
+      - dev-net
+
+networks:
+  dev-net:
+    driver: bridge

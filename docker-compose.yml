@@ -1,6 +1,6 @@
 services:
   # Web browser container
-  chrome:
+  web_browser_container:
     image: selenium/standalone-chrome:latest
     # image: selenium/standalone-chromium:latest
     # image: selenium/standalone-firefox:latest
@@ -13,6 +13,7 @@ services:
       # Fix the screen size so the video recorder knows exactly what to capture
       - SE_SCREEN_WIDTH=${SE_SCREEN_WIDTH}
       - SE_SCREEN_HEIGHT=${SE_SCREEN_HEIGHT}
+      - SE_NODE_MAX_SESSION=${SE_NODE_MAX_SESSION}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:4444/wd/hub/status"]
       interval: 10s
@@ -20,23 +21,25 @@ services:
       retries: 5
 
   # Python script container
-  scraper:
+  bot:
     build: .
     depends_on:
-      chrome:
+      web_browser_container:
         condition: service_healthy
     environment:
-      - SELENIUM_HOST=chrome
+      - SELENIUM_HOST=web_browser_container
     volumes:
       - ./main.py:/app/main.py # Mount script for easy editing
 
   # Video Recording Service
-  # video:
-  #   image: selenium/video:latest
-  #   volumes:
-  #     - ./videos:/videos
-  #   depends_on:
-  #     - chrome
-  #   environment:
-  #     - DISPLAY_CONTAINER_NAME=chrome
-  #     - FILE_NAME=recording.mp4
+  video:
+    image: selenium/video:latest
+    volumes:
+      - ./videos:/videos
+    depends_on:
+      - web_browser_container
+    environment:
+      - DISPLAY_CONTAINER_NAME=web_browser_container
+      - SE_SCREEN_WIDTH=${SE_SCREEN_WIDTH}
+      - SE_SCREEN_HEIGHT=${SE_SCREEN_HEIGHT}
+      - FILE_NAME=${FILE_NAME}

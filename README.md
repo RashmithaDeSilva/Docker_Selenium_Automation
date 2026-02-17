@@ -50,7 +50,7 @@ pip install virtualenv
 Linux
 
 ```sh
-sudo apt install python3-virtualenv
+sudo apt install python3-virtualenv -y
 ```
 
 <br>
