@@ -1,6 +1,7 @@
 {
     "cSpell.words": [
         "Abstra",
+        "APPNAME",
         "celerybeat",
         "codz",
         "Connor",
@@ -18,10 +19,12 @@
         "KHTML",
         "Lahiru",
         "libx",
+        "lscr",
         "Marimo",
         "mkdocs",
         "mypy",
         "nosetests",
+        "openqa",
         "PGID",
         "pipenv",
         "Pipfile",
