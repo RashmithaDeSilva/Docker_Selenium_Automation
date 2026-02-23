@@ -31,9 +31,22 @@ selenium/standalone-all-browsers
 _Note:_ Only one Standalone container can run on port `4444` at the same time.
 
 ---
-### Hub and Nodes
 
+### Video recording
 
+Tests execution can be recorded by using the `selenium/video`
+Docker image. One container is needed per each container where a browser is running. This means if you are
+running 5 Nodes/Standalone containers, you will need 5 video containers, the mapping is 1-1.
+
+Currently, the only way to do this mapping is manually (either starting the containers manually or through `docker compose`).
+
+**Notes**:
+- Video recording for headless browsers is not supported. 
+- Video recording tends to use considerable amounts of CPU. Normally you should estimate 1CPU per video container, 
+and 1 CPU per browser container.
+- Videos are stored in the `/videos` directory inside the video container. Map a local directory to get the videos.
+- If you are running more than one video container, be sure to overwrite the video file name through the `FILE_NAME`
+environment variable to avoid unexpected results.
 
 ---
 

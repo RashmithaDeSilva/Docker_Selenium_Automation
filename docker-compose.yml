@@ -14,6 +14,7 @@ services:
       - SE_SCREEN_WIDTH=${SE_SCREEN_WIDTH}
       - SE_SCREEN_HEIGHT=${SE_SCREEN_HEIGHT}
       - SE_NODE_MAX_SESSION=${SE_NODE_MAX_SESSION}
+      - TZ=${TZ}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:4444/wd/hub/status"]
       interval: 10s

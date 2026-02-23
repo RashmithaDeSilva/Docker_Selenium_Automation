@@ -1,34 +1,49 @@
 services:
+  # Web browser container
+  web_browser_container:
+    image: selenium/standalone-chrome:latest
+    # image: selenium/standalone-chromium:latest
+    # image: selenium/standalone-firefox:latest
+    # image: selenium/standalone-edge:latest  # This image only work on windows 
+    shm_size: 2gb # shared memory
+    ports:
+      - "4444:4444" # Expose Selenium port
+      - "7900:7900" # Expose VNC port (password: secret)
+    environment:
+      # Fix the screen size so the video recorder knows exactly what to capture
+      - SE_SCREEN_WIDTH=${SE_SCREEN_WIDTH}
+      - SE_SCREEN_HEIGHT=${SE_SCREEN_HEIGHT}
+      - SE_NODE_MAX_SESSION=${SE_NODE_MAX_SESSION}
+      - TZ=${TZ}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4444/wd/hub/status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # VS code container
   code-server:
-    image: ghcr.io/coder/code-server
-    # image: lscr.io/linuxserver/code-server:latest
+    image: lscr.io/linuxserver/code-server:latest
     container_name: dev-vscode
     restart: unless-stopped
     environment:
-      # Loads the password from the .env file
-      - PASSWORD=${VSCODE_PASSWORD}
-      - TZ=UTC
       # specific user/group IDs to match host (optional, prevents permission issues)
       - PUID=1000
       - PGID=1000
+      - TZ=Etc/UTC
+      # Password setup
+      - PASSWORD=${VSCODE_PASSWORD}
+      - SUDO_PASSWORD=${VSCODE_SUDO_PASSWORD}
+      # Other
+      - DEFAULT_WORKSPACE=${VSCODE_DEFAULT_WORKSPACE}
+      - PWA_APPNAME=${VSCODE_PWA_APPNAME}
     volumes:
-      # Persist VS Code extensions and user data
-      - ./code-data:/home/coder/.local/share/code-server
-      - ./code-config:/home/coder/.config
-      # Mount your actual project directory
-      - ./projects:/home/coder/workspace
-      # STRICTLY REQUIRED for "doing any development":
-      # Allows you to use docker commands INSIDE the container
+      # Mount project directory
+      - ./projects:/config
+      # Allows docker commands INSIDE the container
       # - /var/run/docker.sock:/var/run/docker.sock
     ports:
-      - "8080:8080"
-    # Capable is required for some debugging tools like GDB
-    cap_add:
-      - SYS_PTRACE
-    security_opt:
-      - seccomp:unconfined
-
-    # Optional: If you want it on a custom network
+      - "8443:8443"
     networks:
       - dev-net
 
